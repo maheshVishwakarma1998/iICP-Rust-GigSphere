@@ -1,3 +1,24 @@
+type Gig = record {
+  id : nat64;
+  status : GigStatus;
+  title : text;
+  updated_at : opt nat64;
+  description : text;
+  deadline : nat64;
+  created_at : nat64;
+  employer : text;
+  assigned_to : opt text;
+};
+type GigPayload = record { title : text; description : text; deadline : nat64 };
+type GigStatus = variant { Disputed; Open; Approved; Assigned; Completed };
+type Result = variant { Ok : Gig; Err : text };
+type Result_1 = variant { Ok : text; Err : text };
 service : {
-    "greet": (text) -> (text) query;
+  approve_gig : (nat64) -> (Result);
+  assign_gig : (nat64, text) -> (Result);
+  delete_gig : (nat64) -> (Result_1);
+  get_all_gigs : () -> (vec Gig) query;
+  get_gig : (nat64) -> (opt Gig) query;
+  post_gig : (GigPayload) -> (Gig);
+  update_gig : (nat64, GigPayload) -> (Result);
 }
