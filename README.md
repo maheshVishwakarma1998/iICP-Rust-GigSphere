@@ -1,4 +1,12 @@
-# icp_rust_message_board_contract
+# GigSphere
+GigSphere is a decentralized platform built on the ICP blockchain using Rust, focusing on secure and transparent interactions between employers and workers for gig-based tasks.
+
+## Key Features
+1. Posting Gigs: Employers can create new gigs with details such as title, description, and deadline.
+2. Assigning Gigs: Gigs can be assigned to workers, but only by the employer who created them.
+3. Status Management: Gigs have statuses (Open, Assigned, Approved, Disputed) that control their lifecycle.
+4. Updates and Deletion: Gigs can be updated or deleted, subject to specific restrictions.
+5. Query Operations: Allows retrieval of all gigs or a specific gig by ID.
 
 ### Requirements
 * rustc 1.64 or higher
