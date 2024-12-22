@@ -7,7 +7,6 @@ use ic_stable_structures::{BoundedStorable, Cell, DefaultMemoryImpl, StableBTree
 use std::{borrow::Cow, cell::RefCell};
 use ic_cdk::caller;
 
-
 /// Type alias for virtual memory.
 pub type Memory = VirtualMemory<DefaultMemoryImpl>;
 /// Type alias for a counter to track unique gig IDs.
@@ -16,15 +15,15 @@ pub type IdCell = Cell<u64, Memory>;
 /// Structure representing a gig/task.
 #[derive(candid::CandidType, Clone, Serialize, Deserialize, Default)]
 pub struct Gig {
-    pub id: u64,                        
-    pub title: String,                  
-    pub description: String,            
-    pub employer: String,                
-    pub deadline: u64,                   
-    pub assigned_to: Option<String>,     
-    pub status: GigStatus,              
-    pub created_at: u64,                 
-    pub updated_at: Option<u64>,         
+    pub id: u64,                        // Unique identifier for the gig.
+    pub title: String,                  // Title of the gig.
+    pub description: String,            // Detailed description of the gig.
+    pub employer: String,               // Caller who created the gig.
+    pub deadline: u64,                  // Deadline timestamp for gig completion.
+    pub assigned_to: Option<String>,    // Worker assigned to the gig.
+    pub status: GigStatus,              // Current status of the gig.
+    pub created_at: u64,                // Timestamp when the gig was created.
+    pub updated_at: Option<u64>,        // Timestamp when the gig was last updated.
 }
 
 /// Enum representing possible statuses of a gig.
@@ -32,7 +31,7 @@ pub struct Gig {
 pub enum GigStatus {
     Open,       // Gig is open and not yet assigned.
     Assigned,   // Gig has been assigned to a worker.
-    Approved,  // Gig has been completed by the worker.
+    Approved,   // Gig has been completed and approved.
     Disputed,   // There is a dispute over the gig.
 }
 
@@ -63,7 +62,7 @@ impl Storable for Gig {
 }
 
 impl BoundedStorable for Gig {
-    const MAX_SIZE: u32 = 2048;       // Maximum size for storing a gig.
+    const MAX_SIZE: u32 = 2048;        // Maximum size for storing a gig.
     const IS_FIXED_SIZE: bool = false; // Indicates that size is not fixed.
 }
 
@@ -90,6 +89,11 @@ thread_local! {
 /// Post a new gig.
 #[ic_cdk::update]
 pub fn post_gig(payload: GigPayload) -> Gig {
+    // Validate input fields.
+    if payload.title.is_empty() || payload.description.is_empty() || payload.deadline == 0 {
+        panic!("Invalid input: Title, description, and deadline must be provided.");
+    }
+
     // Generate a unique ID for the new gig.
     let id = ID_COUNTER
         .with(|counter| {
@@ -168,6 +172,10 @@ pub fn approve_gig(id: u64) -> Result<Gig, String> {
 /// Update a gig.
 #[ic_cdk::update]
 pub fn update_gig(id: u64, payload: GigPayload) -> Result<Gig, String> {
+ // Validate input fields.
+    if payload.title.is_empty() || payload.description.is_empty() || payload.deadline == 0 {
+        panic!("Invalid input: Title, description, and deadline must be provided.");
+    }
     GIG_STORAGE.with(|storage| {
         let mut storage = storage.borrow_mut();
         match storage.get(&id) {
